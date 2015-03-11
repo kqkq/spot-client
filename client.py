@@ -51,6 +51,9 @@ while True:
             print 'Connection lost, reconnecting...'
             break
 
+        data = data.replace('K', '')
+        if len(data) == 0: continue
+
         print 'Data received: ' + data
         if data[0] == '?' :                         # Accquire
             s.send(str(status[data[1]]))
