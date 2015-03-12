@@ -3,10 +3,20 @@
 import socket
 import time
 import traceback
+import serial
+import sys
 
-TCP_IP = 'vita.kuangqi.me'
+TCP_IP = 'vita.jinhao.me'
 TCP_PORT = 9058
 BUFFER_SIZE = 1024
+DEMO_MODE = False
+s = None
+
+if(len(sys.argv) != 2):
+    print 'Running in demo mode'
+    DEMO_MODE = True
+
+if(not DEMO_MODE): ser = serial.Serial(sys.argv[1], baudrate = 9600)
 
 status = {'L': 0, 'A': 0, 'W': 0, 'H': 0}
 
@@ -43,12 +53,18 @@ while True:
     while 1:
         try:
             data = s.recv(BUFFER_SIZE)
+        except KeyboardInterrupt:
+            s.close()
+            print "Bye"
+            sys.exit()
         except:
             print 'Connection lost, reconnecting...'
+            s.close()
             break
-        
+
         if(len(data) == 0):
             print 'Connection lost, reconnecting...'
+            s.close()
             break
 
         data = data.replace('K', '')
@@ -61,14 +77,20 @@ while True:
         if data[0] == '!' :                         # ON/OFF
             if data[1].isupper() :   # Turn on
                 status[data[1].upper()] = 1
-                print data[1].upper()
+                command = data[1].upper()
+                print command
+                if(not DEMO_MODE): ser.write(command)
             elif data[1].islower() : # Turn off
                 status[data[1].upper()] = 0
-                print data[1].lower()
+                command = data[1].lower()
+                print command
+                if(not DEMO_MODE): ser.write(command)
             s.send('R')
         if data[0] == '~' and data[1] == 'L' :      # PWM
             status['L'] = int(data[2:])
             s.send('R')
-            print 'L' + str(status['L']).zfill(3)
+            command = 'L' + str(status['L']).zfill(3)
+            print command
+            if(not DEMO_MODE): ser.write(command)
 
     s.close()
