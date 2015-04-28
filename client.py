@@ -6,7 +6,7 @@ import traceback
 import serial
 import sys
 
-TCP_IP = 'vita.jinhao.me'
+TCP_IP = 'api.jinhao.me'
 TCP_PORT = 9058
 BUFFER_SIZE = 1024
 DEMO_MODE = False
